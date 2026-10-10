@@ -1,0 +1,32 @@
+# Segreti e credenziali
+.env
+.env.*
+!.env.example
+
+# Chiavi private TLS
+*.key
+*.key.pem
+
+# Database e dati generati
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/users.json
+data/populate.done
+
+# Risultati dettagliati dell'analisi biometrica
+data/threshold_results/
+
+# Dataset e dati biometrici
+lfw/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# File temporanei e log
+*.log
+*.tmp

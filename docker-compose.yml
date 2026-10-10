@@ -1,0 +1,97 @@
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0.22
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./acl.conf:/mosquitto/acl.conf:ro
+      - ./certs:/mosquitto/certs:ro
+    networks:
+      - mqtt-net
+    restart: unless-stopped
+
+  facenet-server:
+    build: .
+    container_name: facenet-server
+    env_file:
+      - .env
+    depends_on:
+      - mqtt-broker
+    volumes:
+      - ./data:/app/data
+      - ./certs:/app/certs:ro
+    networks:
+      - mqtt-net
+    command: python -u -m server.serverDb
+    restart: unless-stopped
+
+  facenet-populate:
+    build: .
+    container_name: facenet-populate
+    env_file:
+      - .env
+    depends_on:
+      - mqtt-broker
+      - facenet-server
+    volumes:
+      - ./data:/app/data
+      - ./certs:/app/certs:ro
+      - ./lfw:/app/lfw
+    networks:
+      - mqtt-net
+    command: python -u -m client.populateDb
+    restart: "no"
+
+  facenet-access:
+    build: .
+    container_name: facenet-access
+    env_file:
+      - .env
+    depends_on:
+      - mqtt-broker
+      - facenet-server
+      - facenet-populate
+    volumes:
+      - ./data:/app/data
+      - ./certs:/app/certs:ro
+    networks:
+      - mqtt-net
+    command: python -u -m server.serverAccess
+    restart: unless-stopped
+
+  facenet-test:
+    build: .
+    container_name: facenet-test
+    depends_on:
+      - mqtt-broker
+      - facenet-access
+      - facenet-populate
+    volumes:
+      - ./data:/app/data
+      - ./lfw:/app/lfw
+      - ./certs:/app/certs:ro
+    networks:
+      - mqtt-net
+    command: python -u -m client.clientTest
+    restart: "no"
+
+  facenet-threshold:
+    build: .
+    container_name: facenet-threshold
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./lfw:/app/lfw
+      - ./certs:/app/certs:ro
+    networks:
+      - mqtt-net
+    command: python -u -m client.thresholdAnalysis
+    restart: "no"
+
+networks:
+  mqtt-net:
+    driver: bridge

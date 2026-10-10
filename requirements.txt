@@ -1,0 +1,13 @@
+# AI & Vision
+torch>=2.1.0
+torchvision>=0.16.0
+facenet-pytorch>=2.5.3
+opencv-python-headless>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# IoT & Utils
+paho-mqtt>=2.0.0
+cryptography>=41.0.0
+scipy>=1.11.0
+tqdm>=4.66.0

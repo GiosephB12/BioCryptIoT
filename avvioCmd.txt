@@ -1,0 +1,11 @@
+//Per la build
+docker compose up --build
+
+//Per distruggere la build
+docker compose down
+
+//Per distruggere il docker
+docker container prune
+
+//Test per trovare la soglia
+docker compose up --build facenet-threshold
